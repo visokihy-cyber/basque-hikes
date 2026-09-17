@@ -1064,7 +1064,7 @@ function revealPointPhotos(key){
 function openPhoto(id,context=''){
  const p=photoBy(id);if(!p)return;
  pause();if(!context.startsWith('stop:'))revealPointPhotos(p.point);
- photoDialogIds=context.startsWith('stop:')?pointPhotos(context).map(x=>x.id):p.tracks.includes(activeTrack)?trackPhotos().filter(x=>revealedPhotos.has(x.id)).map(x=>x.id):pointPhotos(p.point).map(x=>x.id);
+ photoDialogIds=context.startsWith('stop:')?pointPhotos(context).map(x=>x.id):p.tracks.includes(activeTrack)?trackPhotos().map(x=>x.id):trackPhotos(p.tracks[0]).map(x=>x.id);
  photoDialogIndex=Math.max(0,photoDialogIds.indexOf(id));photoReturnFocus=document.activeElement;
  renderPhotoDialog();if(!$('photoDialog').open)$('photoDialog').showModal();
 }
@@ -1642,7 +1642,7 @@ function toggleMapRoute(id){
 }
 function movePlanRoute(index,delta){const next=index+delta;if(next<0||next>=trip.itinerary.length)return;trip.recommended=[];[trip.itinerary[index],trip.itinerary[next]]=[trip.itinerary[next],trip.itinerary[index]];refreshPlanner();drawAlerts();}
 function renderPlanTickets(){const host=$('planTickets'),copy=$('liftview').cloneNode(true);copy.hidden=false;copy.querySelector('#transitTickets').hidden=trip.transport!=='public';copy.removeAttribute('id');copy.querySelectorAll('[id]').forEach(el=>el.id='plan-copy-'+el.id);host.replaceChildren(copy);}
-function planPhoto(id){const p=photoBy(id);if(!p)return;pause();photoDialogIds=[id];photoDialogIndex=0;photoReturnFocus=document.activeElement;renderPhotoDialog();if(!$('photoDialog').open)$('photoDialog').showModal();}
+function planPhoto(id){const p=photoBy(id);if(!p)return;pause();photoDialogIds=trackPhotos(p.tracks.includes(activeTrack)?activeTrack:p.tracks[0]).map(x=>x.id);if(!photoDialogIds.includes(id))photoDialogIds.unshift(id);photoDialogIndex=photoDialogIds.indexOf(id);photoReturnFocus=document.activeElement;renderPhotoDialog();if(!$('photoDialog').open)$('photoDialog').showModal();}
 function mapAlertRelevant(a,ids,roadIDs,roadsShown=true){
  if(a.scope==='road')return roadsShown&&trip.transport==='car'&&roadIDs.length>1&&(tripTransfers(roadIDs)?.legs||[]).some(l=>roadTouches(a.pos,legRoad(l),500));
  return alertTouches(a,ids);
